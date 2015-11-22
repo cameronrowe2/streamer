@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Streamer - Login</title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+        <!-- jQuery dragster -->
+        <script src="https://rawgithub.com/catmanjan/jquery-dragster/master/jquery.dragster.js"></script>
+
+        <style>
+            body {
+                background-color: #0A0D05;
+                color: #DFE3D7;
+            }
+
+            h1 {
+                font-size: 5.5em;
+                padding: 0.4em 0 0.9em 0;
+            }
+
+            .container-fluid {
+                text-align: center;
+                margin: auto;
+            }
+
+            form {
+                display: inline-block;
+                width: 200px;
+            }
+
+            #create-account-form {
+                display: none;
+            }
+
+            h2 > a {
+                color: #DFE3D7;
+                text-decoration: underline;
+                font-size: 1.15em;
+            }
+
+            a:hover {
+                color: #8BAD46;
+            }
+
+            #short-desc {
+                font-size: 2.3em;
+                padding: 1.2em;
+            }
+
+            p {
+                padding: 0.1em;
+                letter-spacing: 2px;
+            }
+
+            a {
+              color: #DFE3D7;
+            }
+
+            .form-group > .glyphicon {
+                display: none;
+            }
+
+            *:valid {
+                border-color: rgb(204, 204, 204);
+            }
+
+            *:invalid {
+                border-color: red;
+            }
+
+            .g-recaptcha {
+                display: inline-block;
+                width: auto;
+                margin: 0 auto;
+            }
+
+            @media (max-width: 600px) {
+                h1 {
+                    font-size: 4.5em;
+                    padding: 0.4em 0 0.9em 0;
+                }
+
+                #short-desc {
+                    font-size: 1.9em;
+                }
+            }
+        </style>
+
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+    </head>
+    <body id="body">
+        <div class="container-fluid">
+            <h1>Streamer</h1>
+            <form role="form" id="login-form">
+                <div class="form-group">
+                    <input type="email" class="form-control" id="l-email" placeholder="Email" autofocus="autofocus">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="l-pwd" placeholder="Password">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default btn-lg" style="background-color: #8BAD46; border: none">Login</button>
+                </div>
+                <div id="login-err-msg"></div>
+            </form>
+
+
+            <div id="short-desc">
+                <p>Upload Music</p>
+                <p>Listen Anywhere</p>
+            </div>
+
+            <h2><a>Create Account </a></h2>
+            <div style="display: inline-block">
+                <form role="form" id="create-account-form">
+                    <div class="form-group  has-error has-feedback">
+                        <input type="text" class="form-control" id="ca-name" placeholder="Name">
+                        <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                    </div>
+                    <div class="form-group  has-error has-feedback">
+                        <input type="email" class="form-control" id="ca-email" placeholder="Email">
+                        <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                    </div>
+                    <div class="form-group has-error has-feedback">
+                        <input type="password" class="form-control" id="ca-pwd-b1" placeholder="Password">
+                        <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                    </div>
+                    <div class="form-group has-error has-feedback">
+                        <input type="password" class="form-control" id="ca-pwd-b2" placeholder="Password again">
+                        <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                    </div>
+                    <div class="g-recaptcha" data-sitekey="6Lft1wsTAAAAAE4uRLgpeTYESaDEJStvCR5itKUa" data-size="compact"></div>
+                    <div id="ca-err-msg"></div>
+                    <button type="submit" class="btn btn-default btn-lg" style="background-color: #8BAD46; border: none">Create</button>
+
+                </form>
+            </div>
+            <p><a href="mailto:mail@streamer.online">Contact Us</a></p>
+        </div>
+
+        <script>
+            $(document).ready(function(){
+
+                $("h2").click(function(){
+
+                    if( $("#create-account-form").css("display") === "none") {
+                        $("#create-account-form").slideDown(100, function() {
+                            $("html, body").animate({ scrollTop: $(document).height() }, "slow");
+                            $("#create-account-form > div > input[id='ca-name']").focus();
+                        });
+                    } else {
+                        $("#create-account-form").slideUp("slow", function () {
+                            $("#login-form > div > input[id='email']").focus();
+                        });
+
+                    }
+
+                });
+
+                $("#login-form").submit( function(e){
+                    e.preventDefault();
+
+                    $.post("login.php",
+                        {
+                          // potential security breach
+                          email:  $('#l-email').val(),
+                          pwd:    $('#l-pwd').val()
+                        },
+                        function(data, status){
+
+                          if(data === "") {
+                            location.reload();
+                          } else {
+                            $('#login-err-msg').html(data);
+                          }
+                    });
+                });
+
+                function name_valid(name) {
+                  return /^[a-zA-Z\-\s\']{1,32}$/.test(name);
+                }
+
+                function email_valid(email) {
+                  if( /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/.test(email) && email.length < 256) {
+                    return true;
+                  }
+                  return false;
+                }
+
+                function pwd_valid(pwd) {
+                  return /(?=^.{8,64}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/.test(pwd);
+                }
+
+                $("#create-account-form").submit( function(e){
+                    e.preventDefault();
+
+                    var err_str = ''
+
+                    $.each( $("#create-account-form > div > input"), function (index, value) {
+                      var value =  $(value).val()
+
+                      switch(index) {
+                        case 0:
+                          if( !name_valid(value) ) {
+                            $(value).parent().children('span').show();
+                            //err_str = 'Name must contain 1 to 32 lowercase, uppercase, whitespace, \', and - characters';
+                          }
+                          break;
+                        case 1:
+                          if( !email_valid(value) ) {
+                            $(value).parent().children('span').show();
+                            //if(err_str === '') err_str = 'Email is not valid';
+                          }
+                          break;
+                        case 2:
+                          if( !pwd_valid(value) ) {
+                            $(value).parent().children('span').show();
+                            //if(err_str === '') err_str = 'Password must contain 8 - 64 lowercase, uppercase, and number/special characters';
+                          }
+                          break;
+                        case 3:
+                          if( !pwd_valid(value) ) {
+                            $(value).parent().children('span').show();
+                          }
+                          break;
+                      }
+                    });
+
+                    if(err_str) {
+                      $('#ca-err-msg').html(err_str);
+                      return;
+                    }
+
+                    $.post("create_account.php",
+                        {
+                            name:   $('#ca-name').val(),
+                            email:  $('#ca-email').val(),
+                            pwd_1:  $('#ca-pwd-b1').val(),
+                            pwd_2:  $('#ca-pwd-b2').val(),
+                            r_key:  grecaptcha.getResponse()
+                        },
+                        function(data, status){
+                            if(data === "") {
+                              location.reload();
+                            } else {
+                              $('#ca-err-msg').html(data);
+                            }
+                    });
+                });
+
+                $("#create-account-form > div > input").blur( function (e) {
+
+                    var target = $(e.target);
+
+                    if( ! target.val().length ) {
+                        target.css("border-color", "red");
+                        target.next(".glyphicon").show();
+                    } else {
+                        target.css("border-color", "rgb(204, 204, 204)");
+                        target.next(".glyphicon").hide();
+                    }
+
+                    switch( target.attr("id") ) {
+
+                        case "ca-name":
+                            break;
+
+                        case "ca-email":
+
+                            if ( !validateEmail( target.val() ) ) {
+                                //target.css("border-color", "red");
+                                target.next(".glyphicon").show();
+                            } else {
+                                //target.css("border-color", "rgb(204, 204, 204)");
+                                target.next(".glyphicon").hide();
+                            }
+                            break;
+
+                        case "ca-pwd-b1":
+                            break;
+
+                        case "ca-pwd-b2":
+                            break;
+
+                        default:
+                            alert("ERROR: onblur id error");
+                    }
+
+                });
+
+                function validateEmail(email) {
+                    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+                    return re.test(email);
+                }
+            });
+        </script>
+    </body>
+</html>

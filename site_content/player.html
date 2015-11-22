@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+        <!-- jQuery Pause library -->
+        <!-- <script src="jquery.pause.min.js"></script> -->
+
+        <!-- jQuery dragster -->
+        <script src="https://rawgithub.com/catmanjan/jquery-dragster/master/jquery.dragster.js"></script>
+
+        <style>
+
+            html {
+              width: 100%;
+              height: 100%;
+            }
+
+            body {
+                /*min-height: 2000px;*/
+                background-color: #0A0D05;
+
+                /* pad top by navbar height */
+                padding-top: 50px;
+
+                /* Margin bottom by footer height */
+                margin-bottom: 50px;
+
+                position: relative;
+
+                color: #DFE3D7;
+            }
+
+            #upload-box {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 5;
+
+                background-color: rgba(255, 255, 255, 0.6);
+                color: white;
+
+                text-align: center;
+                display: none;
+            }
+
+            #upload-box > p {
+                font-weight: bold;
+            }
+
+            .footer {
+              position: fixed;
+              bottom: 0;
+              width: 100%;
+              /* Set the fixed height of the footer here */
+              height: 50px;
+              background-color: #0A0D05;
+              color: #DFE3D7;
+              z-index: 4;
+            }
+
+            .navbar {
+                background-color: #0A0D05;
+                z-index: 4;
+            }
+
+            .track-bar > div > div {
+                display: inline-block;
+            }
+
+            #track-content {
+                margin: 0;
+                padding: 0;
+                background-color: #0A0D05;
+            }
+
+            .track-bar:first-child {
+                border-top: solid 1px #0A0D05;
+            }
+
+            .track-bar {
+                margin: 0;
+                padding: 0.6em;
+                display: block;
+                text-decoration: none;
+                background-color: #687E3C;
+                color: #DFE3D7;
+                border-bottom: solid 1px #0A0D05;
+                word-wrap: break-word;
+                position: relative;
+            }
+
+            .track-bar:hover {
+                background-color: #8BAD46;
+                color: white;
+                text-decoration: none;
+            }
+
+            .track-bar:active {
+                background-color: #DFE3D7;
+                color: #8BAD46;
+                text-decoration: none;
+            }
+
+            .progress-bar {
+              background-color: #FFA500;
+              position: absolute;
+              z-index: 2;
+              top: 0;
+              left: 0;
+            }
+
+            .upload-name {
+              position: relative;
+              z-index: 3;
+            }
+
+            #search-box {
+                font-size: 0.9em;
+                color: black;
+            }
+
+
+            #streamer-head {
+                text-decoration: none;
+                color: #DFE3D7;
+                font-size: 1.3em;
+                padding-right: 0.6em;
+                font-weight: 250;
+            }
+
+            #streamer-head:hover {
+                text-decoration: none;
+                color: #687E3C;
+            }
+
+            #streamer-head:active {
+                text-decoration: none;
+                color: #8BAD46;
+            }
+
+            .footer > .container-fluid {
+                margin: 0;
+                padding: 0;
+            }
+
+            #play-button > a {
+                font-size: 2.2em;
+                color: #DFE3D7;
+
+                display: inline-block;
+                text-align: center;
+            }
+
+            #play-button> a:hover {
+                color: #687E3C;
+            }
+
+            #play-button> a:active {
+                color: #8BAD46;
+            }
+
+
+            #footer-content {
+                overflow: hidden;
+                padding: 5px;
+            }
+
+            #footer-content div {
+                /*height: 40px;*/
+            }
+
+            #play-button {
+                width: 40px;
+                float: right;
+            }
+
+            #playhead {
+                overflow: hidden;
+                padding: 5px;
+            }
+
+            #playbar {
+                background-color: #1F280D;
+                height: 30px;
+            }
+
+            #liveplay {
+                position: fixed;
+                bottom: 10px;
+                left: 10px;
+                background-color: #687E3C;
+                width: 0px;
+                height: 30px;
+            }
+
+            .footer {
+                -moz-user-select: -moz-none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+
+                /*
+                  Introduced in IE 10.
+                  See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+                */
+                -ms-user-select: none;
+                user-select: none;
+             }
+
+            @media (max-width: 380px) {
+                #streamer-head {
+                    font-size: 1em;
+                }
+
+                #search-box {
+                    width: 140px;
+                }
+            }
+
+
+            /* Custom Navbar */
+            .navbar-default {
+                background-color: #0a0d05;
+                border: none;
+              }
+              .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
+                color: #687E3C;
+              }
+              .navbar-default .navbar-text {
+                color: #dfe3d7;
+              }
+              .navbar-default .navbar-nav > li > a {
+                color: #dfe3d7;
+              }
+              .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+                color: #687E3C;
+              }
+              .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+                color: #687E3C;
+                background-color: #687E3C;
+              }
+              .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+                color: #687E3C;
+              }
+              .navbar-default .navbar-toggle {
+                border-color: #dfe3d7;
+              }
+              .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+                background-color: #687E3C;
+              }
+              .navbar-default .navbar-toggle .icon-bar {
+                background-color: #dfe3d7;
+              }
+              .navbar-default .navbar-collapse,
+              .navbar-default .navbar-form {
+                border-color: black;
+              }
+              .navbar-default .navbar-link {
+                color: #dfe3d7;
+              }
+              .navbar-default .navbar-link:hover {
+                color: #687E3C;
+              }
+
+              /* new */
+              .navbar-default .navbar-nav > li > a:active {
+                color: #8BAD46;
+              }
+
+              .navbar-default .navbar-toggle:active {
+                background-color: #8BAD46;
+              }
+
+
+              .navbar-default .dropdown-menu {
+                background-color: #0a0d05;
+              }
+
+              .navbar-default .dropdown-menu > li > a {
+                color: #dfe3d7;
+              }
+
+              .navbar-default .dropdown-menu > li > a:hover {
+                background-color: #0a0d05;
+                color: #687E3C;
+              }
+
+              .navbar-default .dropdown-menu > li > a:active {
+                background-color: #0a0d05;
+                color: #8BAD46;
+              }
+
+
+              @media (max-width: 767px) {
+                .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+                  color: #dfe3d7;
+                }
+                .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+                  color: #687E3C;
+                }
+                .navbar-default .navbar-nav .open .dropdown-menu > .active > a, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+                  color: #8BAD46;
+                  background-color: #8BAD46;
+                }
+
+                /* new */
+                .navbar-default .navbar-nav .open .dropdown-menu > li > a:active {
+                    color: #8BAD46;
+                }
+              }
+
+        </style>
+
+    </head>
+    <body id="body">
+        <!-- Fixed navbar -->
+        <audio id="audio" style="display: none"></audio>
+        <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+
+                  <div class="navbar-brand">
+                    <a id="streamer-head" href="#">Streamer</a>
+                    <form role="form" id="create-account-form" style="display: inline">
+                        <div class="form-group" style="display: inline">
+                            <input id="search-box" type="search" placeholder="Search" name="searchstr" autofocus/>
+                        </div>
+                    </form>
+                  </div>
+
+                </div>
+
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                      <li><a id="file-upload-link" href="#">Upload</a></li>
+                      <input type="file" multiple id="file-upload" style="display: none">
+
+                      <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="logout.php" id="logout">Logout</a></li>
+                          </ul>
+                      </li>
+
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+
+        <div class="container-fluid" id="track-content">
+
+            <!-- example
+            <a class="track-bar">
+                <div style="display: none">302</div>
+                <div class="row">
+                    <div class="col-xs-4">Cameron Rowe</div>
+                    <div class="col-xs-4">Run</div>
+                    <div class="col-xs-4">Original Mix</div>
+                </div>
+            </a>
+            -->
+
+        </div>
+
+        <!-- footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+
+                <div id="footer-content">
+                    <div id="play-button"><a><span class="glyphicon glyphicon-play"></span></a></div>
+                    <div id="playhead">
+                        <div id="playbar">
+                            <div id="liveplay"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </footer>
+
+        <div id="upload-box">
+            <p>Upload</p>
+        </div>
+
+        <script>
+            $(document).ready(function(){
+
+                var audio = document.getElementById('audio');
+
+                // Listeners
+                $(window).on('beforeunload', function() {
+                  streamTrack('NULL', 0);
+                });
+
+                // play/pause btn
+                $("#play-button > a").click( function () {
+                    togglePlayPause();
+                });
+
+                // track-bar
+                $("#track-content").on("click", ".track-bar", function(e) {
+                    var search = e.target;
+                    var track_id = $(search).closest('.track-bar').find('.track-id').text();
+                    var track_len = parseInt( $(search).closest('.track-bar').find('.track-len').text() );
+
+                    curr_track = track_id;
+                    curr_track_length = track_len;
+
+                    streamTrack(track_id, 0);
+                    startTrack(track_len);
+                });
+
+                $("#track-content").on("contextmenu", ".track-bar", function(e) {
+                    e.preventDefault();
+                    alert('ha');
+                    // show window popup
+                    return false;
+                  /*
+                    var search = e.target;
+                    var track_id = $(search).closest('.track-bar').find('.track-id').text();
+                    var track_len = parseInt( $(search).closest('.track-bar').find('.track-len').text() );
+
+                    curr_track = track_id;
+                    curr_track_length = track_len;
+
+                    streamTrack(track_id, 0);
+                    startTrack(track_len);
+                    */
+                });
+
+                /*
+                document.addEventListener('contextmenu', function(e) {
+
+                    alert('success!');
+
+                }, false);*/
+
+                // playbar hover
+                $("#playbar").hover(function(){
+                    $(this).css("background-color", "#687E3C");
+                    $("#liveplay").css("background-color", "#8BAD46");
+                    }, function(){
+                    $(this).css("background-color", "#1F280D");
+                    $("#liveplay").css("background-color", "#687E3C");
+                });
+
+                $("#playbar").click( function (e) {
+                    jumpTrack(e);
+                });
+
+                $("#search-box").keyup( function(e){
+                    e.preventDefault();
+                    jsSearchTracks(e.target.value);
+                });
+
+                function jsSearchTracks(str) {
+                  // get all tracks
+                  $(".track-bar").each(function() {
+                    var inc = $(this).children(".row").children().filter(function() {
+                      return ( $(this).text().toLowerCase().indexOf(str.toLowerCase()) !== -1 );
+                    });
+
+                    if(inc.length === 0) {
+                      $(this).css("display", "none");
+                    } else {
+                      $(this).css("display", "block");
+                    }
+                  });
+
+                }
+
+                searchTracks("");
+
+                function searchTracks(str) {
+                    $.post("search_tracks.php", { string: str },
+                      function(data, status) {
+                        // display returned resulting tracks
+                        console.log(data);
+
+                        var obj = JSON.parse(data);
+                        $("#track-content").empty();
+                        // add
+                        for(var i = 0; i < obj.length; i++) {
+
+                          $("#track-content").append(
+                              '<a class="track-bar"> \
+                                  <div class="track-id" style="display: none">' + obj[i]["ID_T"] + '</div> \
+                                  <div class="track-len" style="display: none">' + obj[i]["Length"] + '</div> \
+                                  <div class="row"> \
+                                      <div class="col-xs-6">' + obj[i]["Title"] + '</div> \
+                                      <div class="col-xs-6">' + (obj[i]["Artist"] ? obj[i]["Artist"] : '')  + '</div> \
+                                  </div> \
+                              </a>'
+                            );
+                        }
+
+                    });
+                }
+
+                // Track methods
+                var curr_track;
+                var curr_track_length;
+                var curr_track_time;
+
+                function togglePlayPause() {
+                    if( $("#liveplay").is(':animated') ) {
+                        pauseTrack();
+                    } else {
+                        resumeTrack();
+                    }
+                }
+
+                function startTrack(len) {
+                    audio.play();
+                    $("#liveplay").stop().css("width", "0px").animate({width: $("#playbar").css("width") }, len*1000, "linear", endTrack);
+                    $("#play-button > a").html("<span class=\"glyphicon glyphicon-pause\"></span>");
+                }
+
+                function pauseTrack() {
+                    audio.pause();
+                    curr_track_time = audio.currentTime;
+                    $("#liveplay").stop();
+                    $("#play-button > a").html("<span class=\"glyphicon glyphicon-play\"></span>");
+                }
+
+                function resumeTrack() {
+                    audio.play();
+                    $("#liveplay").animate({width: $("#playbar").css("width") }, (curr_track_length-curr_track_time)*1000, "linear", endTrack);
+                    $("#play-button > a").html("<span class=\"glyphicon glyphicon-pause\"></span>");
+                }
+
+                function jumpTrack(e) {
+                    var liveplay = $("#liveplay");
+
+                    // get location of click
+                    var offset = liveplay.offset();
+                    var x = e.pageX - offset.left;
+
+                    // get len of bar
+                    var width = document.getElementById('playbar').offsetWidth;
+                    console.log("width: " + width + ", x: " + x);
+                    var frac = (x/width);
+
+                    if(liveplay.is(':animated')) {
+                      audio.pause();
+                    }
+
+                    curr_track_time = curr_track_length*frac;
+                    console.log('curr_track_time: ' + curr_track_time);
+                    streamTrack(curr_track, parseInt(frac*1000) );
+
+                    // new dest + play new animation from there
+                    if ( liveplay.is(':animated')  ) {
+                        liveplay.stop().css("width", x).animate({width: $("#playbar").css("width") }, (curr_track_length-curr_track_time)*1000, "linear", endTrack);
+                        audio.play();
+                    } else {
+                        liveplay.css("width", x);
+                    }
+
+                }
+
+                function endTrack() {
+                    $("#play-button > a").html("<span class=\"glyphicon glyphicon-play\"></span>");
+
+                    setTimeout(function(){
+                        $("#liveplay").css("width", "0px");
+                    }, 200);
+                }
+
+                // file upload
+                var fileUpLink = document.getElementById("file-upload-link"),
+                    fileUpload = document.getElementById("file-upload");
+
+                fileUpLink.addEventListener("click", function (e) {
+                    if (fileUpload) {
+                      fileUpload.click();
+                    }
+                    e.preventDefault(); // prevent navigation to "#"
+                  });
+
+                var uploadIDs = [];
+
+                // get next upload id available
+                function next_upload_id() {
+
+                  for(var i = 0; i < uploadIDs.length; i++) {
+                    if(uploadIDs[i] === false) {
+                      uploadIDs[i] = true;
+                      return i;
+                    }
+                  }
+
+                  uploadIDs.push(true);
+                  return (uploadIDs.length-1);
+                }
+
+                function clear_upload_id(id) {
+                  uploadIDs[id] = false;
+                }
+
+                // upload files
+                fileUpload.addEventListener("change", function() { uploadFiles(this.files) });
+
+                function uploadFiles(fileList) {
+                  var upload_id = 0;
+
+                  for(var i = 0; i < fileList.length; i++) {
+
+                    if (fileList[i].type === "audio/mpeg" || fileList[i].type === "audio/mp3") {
+
+                        upload_id = next_upload_id();
+
+                        $("#track-content").append(
+                            '<a class="track-bar" style="background-color: #1F280D"> \
+                                <div class="upload-id" style="display: none">' + upload_id + '</div> \
+                                <div class="track-id" style="display: none"></div> \
+                                <div class="track-len" style="display: none"></div> \
+                                <div class="row"> \
+                                    <div class="col-xs-6">' /*+ fileList[i].name*/ + '</div> \
+                                    <div class="col-xs-6"></div> \
+                                </div> \
+                                <div class="upload-name">' + fileList[i].name + '</div> \
+                                <div class="progress-bar"></div> \
+                            </a>'
+                          );
+
+                        // get upload_id track-bar
+                        var t_bar = $(".upload-id").filter(
+                          function() {
+                            return $(this).text() === upload_id.toString();
+                          }
+                        ).parent();
+
+                        $(t_bar).find(".progress-bar").width(0).height( $(".track-bar").outerHeight()-1 );
+
+                        var formData = new FormData();
+                        formData.append("file", fileList[i]);
+                        formData.append("upload_id", upload_id);
+
+                        $.ajax({
+                            url: 'upload_tracks.php',  //Server script to process data
+                            type: 'POST',
+                            xhr: function() {  // Custom XMLHttpRequest
+                                var myXhr = $.ajaxSettings.xhr();
+                                if(myXhr.upload){ // Check if upload property exists
+                                    myXhr.upload.upload_id = upload_id;
+                                    myXhr.upload.addEventListener('progress',progressHandlingFunction, false); // For handling the progress of the upload
+                                }
+                                return myXhr;
+                            },
+                            //Ajax events
+                            beforeSend: beforeSendHandler,
+                            success: completeHandler,
+                            error: errorHandler,
+                            // Form data
+                            data: formData,
+                            //Options to tell jQuery not to process data or worry about content-type.
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            dataType: 'json'
+                        });
+
+                        function progressHandlingFunction(e){
+                            if(e.lengthComputable){
+                                // get upload_id track-bar
+                                var track_bar = $(".upload-id").filter(
+                                  function() {
+                                    return $(this).text() === e.target.upload_id.toString();
+                                  }
+                                ).parent();
+
+                                $(track_bar).find(".progress-bar").width( $(".track-bar").outerWidth() * (e.loaded/e.total) );
+                            }
+                        }
+
+                        function beforeSendHandler() {}
+
+                        function completeHandler(data) {
+                          // append track i3d tags
+                          console.log(data);
+                          var obj = data;
+
+                          // get upload_id track-bar
+                          var track_bar = $(".upload-id").filter(
+                            function() {
+                              return $(this).text() === obj["upload_id"].toString();
+                            }
+                          ).parent();
+
+                          $(track_bar).attr('style', '');
+
+                          if( $(track_bar).size() !== 1) {
+                            console.log('Error! size not 1: ' + $(track_bar).size() );
+                          } else {
+                            // set new data
+                            console.log('len: ' + $(track_bar).children().size() );
+
+                            $(track_bar).children(".track-id").text(obj["ID_T"]);
+                            $(track_bar).children(".track-len").text(obj["Length"]);
+                            var row_elems = $(track_bar).children(".row").children();
+                            $(row_elems)[0].innerHTML = obj["Title"];
+                            $(row_elems)[1].innerHTML = obj["Artist"];
+
+                            $(track_bar).children(".upload-id").remove();
+                            $(track_bar).children(".upload-name").remove();
+                            $(track_bar).children(".progress-bar").remove();
+                            clear_upload_id(parseInt(obj["upload_id"]));
+                          }
+
+                          window.scrollTo(0,document.body.scrollHeight);
+                        }
+
+                        function errorHandler(jqXHR, textStatus, errorThrown ) {
+                          alert('ajax error');
+                          console.log("error");
+                          console.log("jqXHR: "+jqXHR);
+                          console.log("textStatus: "+textStatus);
+                          console.log("errorThrown: "+errorThrown);
+                          var test = $.parseJSON(jqXHR.responseText);
+                          var test2 = $.parseJSON(test.d);
+                          alert(test2[0].Name);
+                        }
+                    }
+                  }
+                  window.scrollTo(0,document.body.scrollHeight);
+                }
+
+                $("html").dragster({
+                    enter: function (dragsterEvent, event) {
+                            console.log("enter");
+                            toggleUploadAnim();
+                    },
+                    leave: function (dragsterEvent, event) {
+                            console.log("leave");
+                            toggleUploadAnim();
+                    },
+                    drop: function (dragsterEvent, event) {
+                            console.log("drop");
+                            toggleUploadAnim();
+
+                            var dt = event.originalEvent.dataTransfer;
+                            var files = dt.files;
+
+                            uploadFiles(files);
+                    }
+                });
+
+                var uploadDisp = false;
+
+                function toggleUploadAnim() {
+                    var upBox = $("#upload-box");
+
+                    if ( !uploadDisp ) {
+                        uploadDisp = true;
+                        upBox.stop();
+                        var winHeight = $(window).height();
+                        upBox.width( $(window).width() );
+                        upBox.height( winHeight );
+                        upBox.children().css("font-size", (upBox.width() + upBox.height() )/ 16).css("line-height", (winHeight*0.85).toString() + "px" );
+                        upBox.fadeIn("slow");
+                    } else {
+                        uploadDisp = false;
+                        upBox.stop();
+                        upBox.fadeOut("slow");
+                    }
+                }
+
+                // loc -> percent
+                function streamTrack(id, loc) {
+                    audio.src = "stream_track.php?track_id="+id+"&loc="+loc;
+                }
+            });
+        </script>
+    </body>
+</html>
