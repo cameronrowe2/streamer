@@ -1,5 +1,6 @@
 <?php
 
+
 session_start();
 
 $req_dir = dirname($_SERVER['DOCUMENT_ROOT']).'//site_content//';

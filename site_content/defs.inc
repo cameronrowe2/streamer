@@ -89,6 +89,11 @@ function log_error($errno, $errstr, $errfile, $errline) {
 
 // returns true if email exists, and if there is onlt one row for an email address
 function email_exists($email) {
+
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  error_reporting(E_ALL);
+
   // Create connection
   $conn = new mysqli('localhost', GET_USER_USR, GET_USER_PWD, 'streamer');
 
@@ -463,7 +468,7 @@ function client_robot($key) {
   $url = 'https://www.google.com/recaptcha/api/siteverify';
 
   $data = array(
-    'secret' => '6Lft1wsTAAAAACY1ZuIk4k4KuYIQ1U8DKUWNsW_b', // secret
+    'secret' => '6Le2a3oUAAAAADmOyRNbZJ8oUx72n9nAu2yBiKOV', // secret
     'response' => $key,
     'remoteip' => $_SERVER['REMOTE_ADDR']
   );
@@ -483,6 +488,7 @@ function client_robot($key) {
   $context  = stream_context_create($options);
 
   $result = file_get_contents($url, false, $context);
+
   if($result === false) {
     trigger_error('Func: client_robot. Captcha - file_get_contents fail for retrieved captch result.');
     return true;
@@ -646,6 +652,9 @@ function create_account($name, $email, $pwd_1, $pwd_2, $r_key) {
       die("Your name can only contain letters, numbers, spaces, - and '");
     }
 
+    // echo email_exists($email);
+    // exit();
+
     // EMAIL
     if( !isset($email) || empty($email) ) {
       die("Please enter an email");
@@ -668,6 +677,8 @@ function create_account($name, $email, $pwd_1, $pwd_2, $r_key) {
       die("This email is already registered");
     }
 
+    
+
     // PWD
 
     // empty
@@ -688,9 +699,10 @@ function create_account($name, $email, $pwd_1, $pwd_2, $r_key) {
     }
 
     // robot
-    if( client_robot($r_key) ) {
-      die("Please complete the reCaptcha");
-    }
+    // REMOVED CAPTCHA CHECK
+    // if( client_robot($r_key) ) {
+    //   die("Please complete the reCaptcha");
+    // }
 
     // hash password
     if( ($pwd_hash = password_hash($pwd_1, PASSWORD_DEFAULT) ) === false) {
@@ -722,7 +734,7 @@ function setup_email_validation($user_id, $email) {
   // create EmailValidation row
   $ev_hash = md5( rand(0,1000) );
 
-  $conn = new mysqli('localhost', 'insert_emailv', 'obscure', 'streamer'); // db data
+  $conn = new mysqli('localhost', INSERT_EMAILV_USR, INSERT_EMAILV_PWD, 'streamer'); // db data
   if ($conn->connect_error) {
       trigger_error('Func: setup_email_validation. MYSQL Connection failed: '.$conn->connect_error, E_USER_WARNING);
       die('An unexpected error occured setting up your account');

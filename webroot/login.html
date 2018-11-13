@@ -96,7 +96,7 @@
             }
         </style>
 
-        <script src='https://www.google.com/recaptcha/api.js'></script>
+<script src='https://www.google.com/recaptcha/api.js?render=6Le2a3oUAAAAAGWiSCxA03o7oxXsn5qB-eN1x6cx'></script>
     </head>
     <body id="body">
         <div class="container-fluid">
@@ -139,7 +139,7 @@
                         <input type="password" class="form-control" id="ca-pwd-b2" placeholder="Password again">
                         <span class="glyphicon glyphicon-remove form-control-feedback"></span>
                     </div>
-                    <div class="g-recaptcha" data-sitekey="6Lft1wsTAAAAAE4uRLgpeTYESaDEJStvCR5itKUa" data-size="compact"></div>
+                    <input class="g-recaptcha" data-sitekey="6Le2a3oUAAAAAGWiSCxA03o7oxXsn5qB-eN1x6cx" data-size="compact">
                     <div id="ca-err-msg"></div>
                     <button type="submit" class="btn btn-default btn-lg" style="background-color: #8BAD46; border: none">Create</button>
 
@@ -149,6 +149,13 @@
         </div>
 
         <script>
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6Le2a3oUAAAAAGWiSCxA03o7oxXsn5qB-eN1x6cx', {action: 'homepage'}).then(function(token) {
+                    console.log(token)
+                    document.getElementsByClassName("g-recaptcha")[0].value = token
+                });
+            });
+            
             $(document).ready(function(){
 
                 $("h2").click(function(){
@@ -202,6 +209,7 @@
                 }
 
                 $("#create-account-form").submit( function(e){
+                    console.log('here')
                     e.preventDefault();
 
                     var err_str = ''
@@ -247,7 +255,7 @@
                             email:  $('#ca-email').val(),
                             pwd_1:  $('#ca-pwd-b1').val(),
                             pwd_2:  $('#ca-pwd-b2').val(),
-                            r_key:  grecaptcha.getResponse()
+                            r_key:  $('.g-recaptcha').val()
                         },
                         function(data, status){
                             if(data === "") {
